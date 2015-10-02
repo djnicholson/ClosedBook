@@ -9,7 +9,50 @@ var startLogin = function () {
 };
 
 var receivePostsPage = function (apiResponse) {
-    alert(JSON.stringify(apiResponse));
+    var data = {};
+
+    if (!apiResponse) {
+        alert("Error: No JSON response received.");
+        return;
+    }
+
+    if (!apiResponse.posts) {
+        if (!apiResponse.data) {
+            alert("Error: JSON response does not have a top-level 'posts' or 'data' field. " + JSON.stringify(apiResponse));
+            return;
+        }
+        data = apiResponse.data;
+    } else {
+        if (!apiResponse.posts.data) {
+            alert("Error: No posts data. " + JSON.stringify(apiResponse));
+            return;
+        }
+        data = apiResponse.posts.data;
+    }
+
+    if (Object.prototype.toString.call(data) !== '[object Array]') {
+        alert("Error: Posts data is not an array. " + JSON.stringify(apiResponse));
+        return;
+    }
+
+    for (var i = 0; i < data.length; i++) {
+        console.log("Post: " + data[i].id);
+    }
+
+    var nextPageUrl;
+
+    if (apiResponse.posts && apiResponse.posts.paging && apiResponse.posts.paging.next) {
+        nextPageUrl = apiResponse.posts.paging.next;
+    }
+
+    if (apiResponse.paging && apiResponse.paging.next) {
+        nextPageUrl = apiResponse.paging.next;
+    }
+
+    if (nextPageUrl) {
+        console.log("(next page)");
+        $.getJSON(nextPageUrl, receivePostsPage);
+    }
 };
 
 var processLoginResponse = function (currentStatus) {
