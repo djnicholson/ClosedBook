@@ -1,11 +1,16 @@
 var appId = 559895940818205; // TODO: Allow easy customization
-var requiredPermissions = "user_posts";
+var requiredPermissions = "user_posts,publish_actions";
 var graphApiPath = "/me";
-var graphApiMethod = "GET";
 var graphApiFields = "posts{id}";
+var denyList = "934624074069"; // TODO: Needs to be set ot the individual users "Aquaintances" list ID
 
 var startLogin = function () {
     FB.login(processLoginResponse, { scope: requiredPermissions });
+};
+
+var changePrivacySettingForPost = function (postId) {
+    var postUrl = "/" + postId;
+    FB.api(postUrl, "POST", { "privacy.value": "CUSTOM", "privacy.allow": "ALL_FRIENDS", "privacy.deny": denyList });
 };
 
 var receivePostsPage = function (apiResponse) {
@@ -37,6 +42,7 @@ var receivePostsPage = function (apiResponse) {
 
     for (var i = 0; i < data.length; i++) {
         console.log("Post: " + data[i].id);
+        changePrivacySettingForPost(data[i].id);
     }
 
     var nextPageUrl;
@@ -63,7 +69,7 @@ var processLoginResponse = function (currentStatus) {
         startLogin();
     } else {
         // Get a list of all posts by active user:
-        FB.api(graphApiPath, graphApiMethod, { fields: graphApiFields }, receivePostsPage);
+        FB.api(graphApiPath, "GET", { fields: graphApiFields }, receivePostsPage);
     }
 };
 
