@@ -1,8 +1,15 @@
 var appId = 559895940818205; // TODO: Allow easy customization
 var requiredPermissions = "user_posts";
+var graphApiPath = "/me";
+var graphApiMethod = "GET";
+var graphApiFields = "posts{id}";
 
 var startLogin = function () {
     FB.login(processLoginResponse, { scope: requiredPermissions });
+};
+
+var receivePostsPage = function (apiResponse) {
+    alert(JSON.stringify(apiResponse));
 };
 
 var processLoginResponse = function (currentStatus) {
@@ -13,14 +20,7 @@ var processLoginResponse = function (currentStatus) {
         startLogin();
     } else {
         // Get a list of all posts by active user:
-        FB.api(
-            '/me',
-            'GET',
-            { "fields": "posts{id}" },
-            function (response) {
-                alert(JSON.stringify(response));
-            }
-        );
+        FB.api(graphApiPath, graphApiMethod, { fields: graphApiFields }, receivePostsPage);
     }
 };
 
@@ -34,4 +34,3 @@ $(document).ready(function () {
 
     startLogin();
 });
-
