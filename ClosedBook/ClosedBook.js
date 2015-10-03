@@ -8,9 +8,18 @@ var startLogin = function () {
     FB.login(processLoginResponse, { scope: requiredPermissions });
 };
 
+var processUpdateResponse = function (postUrl, response) {
+    (response && response.success && response.success === true) ||
+        alert("Error updating " + postUrl + ": " + JSON.stringify(response));
+};
+
 var changePrivacySettingForPost = function (postId) {
     var postUrl = "/" + postId.split("_")[0];
-    FB.api(postUrl, "POST", { "privacy.value": "CUSTOM", "privacy.allow": "ALL_FRIENDS", "privacy.deny": denyList });
+    FB.api(
+        postUrl,
+        "POST",
+        { "privacy.value": "CUSTOM", "privacy.allow": "ALL_FRIENDS", "privacy.deny": denyList },
+        function (response) { processUpdateResponse(postUrl, response); });
 };
 
 var receivePostsPage = function (apiResponse) {
