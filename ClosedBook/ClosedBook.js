@@ -4,7 +4,7 @@ var graphApiPath = "/me/feed";
 var graphApiFields = "id,privacy";
 
 var targetValue = "CUSTOM";
-var targetAllow = "ALL_FRIENDS";
+var targetFriends = "ALL_FRIENDS";
 var targetDeny = "934624074069"; // TODO: Needs to be set ot the individual users "Aquaintances" list ID
 
 var startLogin = function () {
@@ -18,20 +18,18 @@ var processUpdateResponse = function (post, response) {
 
 var changePrivacySettingForPost = function (post) {
 
-    if (post.privacy.value && post.privacy.value === targetValue &&
-        post.privacy.friends && post.privacy.friends === targetAllow &&
-        post.privacy.deny && post.privacy.deny == targetDeny) {
-
-        console.log(post.id + ": No update needed");
+    if (!post.privacy || !post.privacy.value || post.privacy.value === "SELF" || post.privacy.value === "CUSTOM")
+    {
+        console.log(post.id + ": Not touching: " + JSON.stringify(post));
         return;
     }
 
-    console.log(post.id + ": Updating...");
-    var postUrl = "/" + post.id.split("_")[1];
+    console.log(post.id + ": Updating: " + JSON.stringify(post));
+    var postUrl = "/" + post.id;//.split("_")[1];
     FB.api(
         postUrl,
         "POST",
-        { "privacy.value": targetValue, "privacy.allow": targetAllow, "privacy.deny": targetDeny, "privacy.description": "ClosedBook.js", "privacy.friends": targetAllow },
+        { "privacy.value": targetValue, "privacy.friends": targetFriends, "privacy.deny": targetDeny, "privacy.description": "ClosedBook.js", "privacy.allow": "" },
         function (response) { processUpdateResponse(post, response); });
 };
 
