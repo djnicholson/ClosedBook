@@ -17,6 +17,7 @@ var processUpdateResponse = function (post, response) {
 };
 
 var changePrivacySettingForPost = function (post) {
+
     if (post.privacy.value && post.privacy.value === targetValue &&
         post.privacy.friends && post.privacy.friends === targetAllow &&
         post.privacy.deny && post.privacy.deny == targetDeny) {
@@ -26,11 +27,11 @@ var changePrivacySettingForPost = function (post) {
     }
 
     console.log(post.id + ": Updating...");
-    var postUrl = "/" + post.id.split("_")[0];
+    var postUrl = "/" + post.id.split("_")[1];
     FB.api(
         postUrl,
         "POST",
-        { "privacy.value": targetValue, "privacy.allow": targetAllow, "privacy.deny": targetDeny },
+        { "privacy.value": targetValue, "privacy.allow": targetAllow, "privacy.deny": targetDeny, "privacy.description": "ClosedBook.js", "privacy.friends": targetAllow },
         function (response) { processUpdateResponse(post, response); });
 };
 
