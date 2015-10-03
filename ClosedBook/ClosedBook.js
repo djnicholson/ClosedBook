@@ -13,7 +13,7 @@ var startLogin = function () {
 
 var processUpdateResponse = function (post, response) {
     (response && response.success && response.success === true) ||
-        alert("Error updating " + JSON.stringify(post) + ": " + JSON.stringify(response));
+        console.error("Error updating " + JSON.stringify(post) + ": " + JSON.stringify(response));
 };
 
 var changePrivacySettingForPost = function (post) {
@@ -68,7 +68,7 @@ var receivePostsPage = function (apiResponse) {
 
     if (nextPageUrl) {
         console.log("(next page)");
-        //$.getJSON(nextPageUrl, receivePostsPage);
+        $.getJSON(nextPageUrl, receivePostsPage);
     }
 };
 
