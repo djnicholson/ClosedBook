@@ -1,7 +1,7 @@
 var appId = 559895940818205; // TODO: Allow easy customization
 var requiredPermissions = "user_posts,publish_actions";
-var graphApiPath = "/me";
-var graphApiFields = "posts{id}";
+var graphApiPath = "/me/feed";
+var graphApiFields = "id";
 var denyList = "934624074069"; // TODO: Needs to be set ot the individual users "Aquaintances" list ID
 
 var startLogin = function () {
@@ -9,32 +9,22 @@ var startLogin = function () {
 };
 
 var changePrivacySettingForPost = function (postId) {
-    var postUrl = "/" + postId;
+    var postUrl = "/" + postId.split("_")[0];
     FB.api(postUrl, "POST", { "privacy.value": "CUSTOM", "privacy.allow": "ALL_FRIENDS", "privacy.deny": denyList });
 };
 
 var receivePostsPage = function (apiResponse) {
-    var data = {};
-
     if (!apiResponse) {
         alert("Error: No JSON response received.");
         return;
     }
 
-    if (!apiResponse.posts) {
-        if (!apiResponse.data) {
-            alert("Error: JSON response does not have a top-level 'posts' or 'data' field. " + JSON.stringify(apiResponse));
-            return;
-        }
-        data = apiResponse.data;
-    } else {
-        if (!apiResponse.posts.data) {
-            alert("Error: No posts data. " + JSON.stringify(apiResponse));
-            return;
-        }
-        data = apiResponse.posts.data;
+    if (!apiResponse.data) {
+        alert("Error: JSON response does not have a top-level 'feed' or 'data' field. " + JSON.stringify(apiResponse));
+        return;
     }
-
+    var data = apiResponse.data;
+    
     if (Object.prototype.toString.call(data) !== '[object Array]') {
         alert("Error: Posts data is not an array. " + JSON.stringify(apiResponse));
         return;
@@ -78,7 +68,11 @@ $(document).ready(function () {
     FB.init({
         appId: appId,
         xfbml: true,
-        version: 'v2.4',
+
+        // Deliberately not using the latest version of the API.  Beyond
+        // v2.2 Facebook blocked apps from editing posts that they did not
+        // create.
+        version: 'v2.2',
     });
 
     startLogin();
