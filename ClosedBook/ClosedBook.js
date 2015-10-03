@@ -1,25 +1,37 @@
 var appId = 559895940818205; // TODO: Allow easy customization
 var requiredPermissions = "user_posts,publish_actions";
 var graphApiPath = "/me/feed";
-var graphApiFields = "id";
-var denyList = "934624074069"; // TODO: Needs to be set ot the individual users "Aquaintances" list ID
+var graphApiFields = "id,privacy";
+
+var targetValue = "CUSTOM";
+var targetAllow = "ALL_FRIENDS";
+var targetDeny = "934624074069"; // TODO: Needs to be set ot the individual users "Aquaintances" list ID
 
 var startLogin = function () {
     FB.login(processLoginResponse, { scope: requiredPermissions });
 };
 
-var processUpdateResponse = function (postUrl, response) {
+var processUpdateResponse = function (post, response) {
     (response && response.success && response.success === true) ||
-        alert("Error updating " + postUrl + ": " + JSON.stringify(response));
+        alert("Error updating " + JSON.stringify(post) + ": " + JSON.stringify(response));
 };
 
-var changePrivacySettingForPost = function (postId) {
-    var postUrl = "/" + postId.split("_")[0];
+var changePrivacySettingForPost = function (post) {
+    if (post.privacy.value && post.privacy.value === targetValue &&
+        post.privacy.friends && post.privacy.friends === targetAllow &&
+        post.privacy.deny && post.privacy.deny == targetDeny) {
+
+        console.log(post.id + ": No update needed");
+        return;
+    }
+
+    console.log(post.id + ": Updating...");
+    var postUrl = "/" + post.id.split("_")[0];
     FB.api(
         postUrl,
         "POST",
-        { "privacy.value": "CUSTOM", "privacy.allow": "ALL_FRIENDS", "privacy.deny": denyList },
-        function (response) { processUpdateResponse(postUrl, response); });
+        { "privacy.value": targetValue, "privacy.allow": targetAllow, "privacy.deny": targetDeny },
+        function (response) { processUpdateResponse(post, response); });
 };
 
 var receivePostsPage = function (apiResponse) {
@@ -40,8 +52,7 @@ var receivePostsPage = function (apiResponse) {
     }
 
     for (var i = 0; i < data.length; i++) {
-        console.log("Post: " + data[i].id);
-        changePrivacySettingForPost(data[i].id);
+        changePrivacySettingForPost(data[i]);
     }
 
     var nextPageUrl;
@@ -56,7 +67,7 @@ var receivePostsPage = function (apiResponse) {
 
     if (nextPageUrl) {
         console.log("(next page)");
-        $.getJSON(nextPageUrl, receivePostsPage);
+        //$.getJSON(nextPageUrl, receivePostsPage);
     }
 };
 
