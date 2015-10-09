@@ -5,7 +5,7 @@ var graphApiFields = "id,privacy";
 
 var targetValue = "CUSTOM";
 var targetFriends = "ALL_FRIENDS";
-var targetDeny = "934624074069"; // TODO: Needs to be set ot the individual users "Aquaintances" list ID
+var targetDeny = "934624074069"; // TODO: Needs to be set to the individual users "Aquaintances" list ID
 
 var startLogin = function () {
     FB.login(processLoginResponse, { scope: requiredPermissions });
