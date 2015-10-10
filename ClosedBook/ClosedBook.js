@@ -1,3 +1,8 @@
+if (window.location.href.match("debug=1")) {
+    alert("Launching JavaScript debugger due to presence of debug=1 in URL");
+    debugger;
+}
+
 var appId = 559895940818205; // TODO: Allow easy customization
 var requiredPermissions = "user_posts,publish_actions";
 var graphApiPath = "/me/feed";
